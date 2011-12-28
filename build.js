@@ -26,14 +26,8 @@ task('jslint', function () {
 });
 
 task('build', ['version', 'test'], function () {
-	var files = fs.createScanner('src')
-		.include('**/*.js')
-		.scan();
-
-	var content = utils.map(files, function (file) {
-		return fs.readFile(file);
-	});
-
+	var buildPath = fs.combinePaths('build', 'jsonrpc-' + versionStr);
+	
 	var header = [];
 	header.push('/*');
 	header.push('JsonRpcJs version ' + versionStr);
@@ -42,15 +36,22 @@ task('build', ['version', 'test'], function () {
 	header.push('');
 	header.push(fs.readFile('LICENSE'));
 	header.push('*/');
-	content.unshift(header.join('\n'));
-
-	content = content.join('\n');
 	
-	fs.writeFile('build/jsonrpc-' + versionStr + '.js', content);
+	var files = fs.createScanner('src')
+		.include('**/*.js')
+		.scan();
+
+	var content = utils.map(files, function (file) {
+		return fs.readFile(file);
+	});
+
+	fs.writeFile(fs.combinePaths(buildPath, 'jsonrpc.js'), header.concat(content).join('\n'));
 
 	var uglifyjs = require('tools/uglifyjs/uglify-js');
-	var content = uglifyjs(content);
-	fs.writeFile('build/jsonrpc-' + versionStr + '.min.js', content);
+	content = uglifyjs(content.join('\n'));
+	fs.writeFile(fs.combinePaths(buildPath, 'jsonrpc.min.js'), header.concat(content).join('\n'));
+	
+	fs.zipPath(buildPath, buildPath + '.zip');
 });
 
 task('test', 'jslint', function () {
@@ -68,6 +69,11 @@ task('test', 'jslint', function () {
 		runner.args(file);
 	});
 	runner.run();
+});
+
+task('release', [ 'build' ], function () {
+	version.patch += 1;
+	fs.writeFile('version.json', JSON.stringify(version));
 });
 
 
