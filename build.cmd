@@ -1,0 +1,1 @@
+tools\jsmake\jsmake.cmd %*
