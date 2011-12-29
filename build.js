@@ -26,7 +26,8 @@ task('jslint', function () {
 });
 
 task('build', ['version', 'test'], function () {
-	var buildPath = fs.combinePaths('build', 'jsonrpc-' + versionStr);
+	var buildName = 'jsonrpc-' + versionStr;
+	fs.deletePath(fs.combinePaths('build', buildName));
 	
 	var header = [];
 	header.push('/*');
@@ -45,13 +46,13 @@ task('build', ['version', 'test'], function () {
 		return fs.readFile(file);
 	});
 
-	fs.writeFile(fs.combinePaths(buildPath, 'jsonrpc.js'), header.concat(content).join('\n'));
+	fs.writeFile(fs.combinePaths('build', buildName, buildName + '.js'), header.concat(content).join('\n'));
 
 	var uglifyjs = require('tools/uglifyjs/uglify-js');
 	content = uglifyjs(content.join('\n'));
-	fs.writeFile(fs.combinePaths(buildPath, 'jsonrpc.min.js'), header.concat(content).join('\n'));
+	fs.writeFile(fs.combinePaths('build', buildName, buildName + '.min.js'), header.concat(content).join('\n'));
 	
-	fs.zipPath(buildPath, buildPath + '.zip');
+	fs.zipPath(fs.combinePaths('build', buildName), fs.combinePaths('build', buildName + '.zip'));
 });
 
 task('test', 'jslint', function () {
