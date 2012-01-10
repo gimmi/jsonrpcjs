@@ -9,19 +9,20 @@ describe('jsonrpc.CallStack', function () {
 	});
 
 	it('should keep scope and parameters', function () {
-		var scope = {},		
+		var enterScope = {},		
+			exitScope = {},
 			enterFn = jasmine.createSpy(),
 			exitFn = jasmine.createSpy(),
-			target = new jsonrpc.CallStack(enterFn, exitFn, scope);
+			target = new jsonrpc.CallStack(enterFn, enterScope, exitFn, exitScope);
 			
 		target.enter(1, 2, 3);
 		target.exit(4, 5, 6);
 		
 		expect(enterFn).toHaveBeenCalledWith(1, 2, 3);
-		expect(enterFn.mostRecentCall.object).toBe(scope);
+		expect(enterFn.mostRecentCall.object).toBe(enterScope);
 
 		expect(exitFn).toHaveBeenCalledWith(4, 5, 6);
-		expect(exitFn.mostRecentCall.object).toBe(scope);
+		expect(exitFn.mostRecentCall.object).toBe(exitScope);
 	});
 	
 	it('should simmetrically invoke enter and exit fn', function () {
@@ -29,8 +30,7 @@ describe('jsonrpc.CallStack', function () {
 			enter = [],
 			exit = [];
 		var target, scope;
-		scope = {};
-		target = new jsonrpc.CallStack(function () { enter.push(++count); }, function () { exit.push(++count); }, scope);
+		target = new jsonrpc.CallStack(function () { enter.push(++count); }, null, function () { exit.push(++count); }, null);
 		
 		target.exit();
 		target.enter();
