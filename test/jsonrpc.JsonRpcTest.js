@@ -1,8 +1,8 @@
-describe("jsonrpc", function () {
+describe("jsonrpc.JsonRpc", function () {
 	var target;
 
 	beforeEach(function () {
-		target = new JsonRpc('rpc');
+		target = new jsonrpc.JsonRpc('rpc');
 	});
 
 	it("isFunction", function () {

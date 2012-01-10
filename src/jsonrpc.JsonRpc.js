@@ -1,9 +1,11 @@
-JsonRpc = function(url) {
+jsonrpc = window.jsonrpc || { };
+
+jsonrpc.JsonRpc = function(url) {
 	this._url = url;
 	this._id = 0;
 };
 
-JsonRpc.prototype = {
+jsonrpc.JsonRpc.prototype = {
 	call: function(/* ... */) {
 		var args = this._getParams.apply(this, arguments);
 
