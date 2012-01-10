@@ -31,7 +31,7 @@ jsonrpc.JsonRpc.prototype = {
 		});
 	},
 
-	_getParams: function() {
+	_getParams: function(/* ... */) {
 		var args = Array.prototype.slice.call(arguments),
 			ret = {
 				request: {
