@@ -28,8 +28,8 @@ describe('jsonrpc.CallStack', function () {
 	it('should simmetrically invoke enter and exit fn', function () {
 		var count = 0,
 			enter = [],
-			exit = [];
-		var target, scope;
+			exit = [],
+			target;
 		target = new jsonrpc.CallStack(function () { enter.push(++count); }, null, function () { exit.push(++count); }, null);
 		
 		target.exit();
