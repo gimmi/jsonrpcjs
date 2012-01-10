@@ -15,6 +15,7 @@ jsonrpc.CallStack.prototype = {
 			this._enterFn.apply(this._enterScope, arguments);
 		}
 	},
+	
 	exit: function (fn) {
 		this._counter -= 1;
 		if (this._counter === 0) {
