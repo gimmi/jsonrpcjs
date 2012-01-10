@@ -94,8 +94,10 @@ describe("jsonrpc.JsonRpc", function () {
 		expect(failureFn).not.toHaveBeenCalled();
 		expect(successFn).toHaveBeenCalledWith('return val');
 		expect(successFn.callCount).toBe(1);
+		expect(successFn.mostRecentCall.object).toBe(scope);
 		expect(callbackFn).toHaveBeenCalledWith(true, 'return val');
 		expect(callbackFn.callCount).toBe(1);
+		expect(callbackFn.mostRecentCall.object).toBe(scope);
 	});
 
 	it('should invoke expected callbacks on transport error', function () {
@@ -144,5 +146,21 @@ describe("jsonrpc.JsonRpc", function () {
 		expect(successFn).not.toHaveBeenCalled();
 		expect(callbackFn).toHaveBeenCalledWith(false, 'rpc error');
 		expect(callbackFn.callCount).toBe(1);
+	});
+
+	it('should trigger loading and loaded events', function () {
+		var loadingFn = jasmine.createSpy(),
+		    loadedFn = jasmine.createSpy();
+
+		target.loading.bind(loadingFn);
+		target.loaded.bind(loadedFn);
+		spyOn(target, '_doJsonPost').andCallFake(function (url, data, callback) {
+			callback(true, { result: 'return val' });
+		});
+
+		target.call('method', 1, 2, 3, function () {});
+
+		expect(loadingFn.callCount).toBe(1);
+		expect(loadedFn.callCount).toBe(1);
 	});
 });

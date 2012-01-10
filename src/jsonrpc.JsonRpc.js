@@ -3,13 +3,20 @@ jsonrpc = window.jsonrpc || { };
 jsonrpc.JsonRpc = function(url) {
 	this._url = url;
 	this._id = 0;
+	this.loading = new jsonrpc.Observable();
+	this.loaded = new jsonrpc.Observable();
+	this._loadingState = new jsonrpc.CallStack(this.loading.trigger, this.loading, this.loaded.trigger, this.loaded);
 };
 
 jsonrpc.JsonRpc.prototype = {
 	call: function(/* ... */) {
-		var args = this._getParams.apply(this, arguments);
+		var me = this,
+			args = me._getParams.apply(this, arguments);
 
-		this._doJsonPost(this._url, args.request, function(success, data) {
+		me._loadingState.enter();
+		
+		me._doJsonPost(me._url, args.request, function(success, data) {
+			me._loadingState.exit();
 			if (!success) {
 				data = { error: { message: data } };
 			}
