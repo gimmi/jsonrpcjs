@@ -27,7 +27,7 @@
     global.clearInterval = global.clearTimeout;
 })(this);
 
-window = {}; // jasmine uses window to detect commonjs environment
+this.window = this; // jasmine uses 'window' global variable to detect commonjs environment. We want Jasmine to behave like when run in browser
 load('tools/jasmine/jasmine.js');
 
 //var jasmine = require('tools/jasmine/jasmine').jasmine;
