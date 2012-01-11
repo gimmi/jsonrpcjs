@@ -27,11 +27,5 @@ jsonrpc.DelayedTask.prototype = {
 			window.clearInterval(this._id);
 			this._id = null;
 		}
-	},
-
-	_call: function() {
-		window.clearInterval(this._id);
-		this._id = null;
-		this._fn.apply(this._scope, this._args);
 	}
 };
