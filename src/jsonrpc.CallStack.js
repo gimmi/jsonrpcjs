@@ -11,11 +11,11 @@ jsonrpc.CallStack = function (enterFn, enterScope, exitFn, exitScope) {
 jsonrpc.CallStack.prototype = {
 	enter: function () {
 		this._counter = (this._counter < 0 ? 1 : this._counter + 1);
-		if(this._counter === 1) {
+		if (this._counter === 1) {
 			this._enterFn.apply(this._enterScope, arguments);
 		}
 	},
-	
+
 	exit: function (fn) {
 		this._counter -= 1;
 		if (this._counter === 0) {

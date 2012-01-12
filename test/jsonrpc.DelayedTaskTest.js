@@ -8,9 +8,9 @@ describe('jsonrpc.DelayedTask', function () {
 			target.delay(100);
 			expect(fn).not.toHaveBeenCalled();
 		});
-		
-		waits(110);
-		
+
+		waitsFor(110);
+
 		runs(function () {
 			expect(fn).toHaveBeenCalledWith(1, 2, 3);
 			expect(fn.mostRecentCall.object).toBe(scope);
@@ -24,15 +24,15 @@ describe('jsonrpc.DelayedTask', function () {
 		runs(function () {
 			target.delay(100);
 		});
-		
-		waits(50);
-		
+
+		waitsFor(50);
+
 		runs(function () {
 			target.cancel();
 		});
 
-		waits(60);
-		
+		waitsFor(60);
+
 		runs(function () {
 			expect(fn).not.toHaveBeenCalled();
 		});
@@ -47,9 +47,9 @@ describe('jsonrpc.DelayedTask', function () {
 		runs(function () {
 			target.delay(30, newFn, newScope, [1, 2, 3]);
 		});
-		
-		waits(50);
-		
+
+		waitsFor(50);
+
 		runs(function () {
 			expect(fn).not.toHaveBeenCalled();
 			expect(newFn).toHaveBeenCalledWith(1, 2, 3);
@@ -67,23 +67,23 @@ describe('jsonrpc.DelayedTask', function () {
 			start = new Date().getTime();
 			target.delay(50);
 		});
-		
-		waits(30);
+
+		waitsFor(30);
 
 		runs(function () {
 			target.delay(50);
 		});
-		
-		waits(30);
+
+		waitsFor(30);
 
 		runs(function () {
 			target.delay(50);
 		});
-		
+
 		waitsFor(function () {
 			return !!stop;
 		});
-		
+
 		runs(function () {
 			expect(stop - start).toBeGreaterThan(100);
 			expect(stop - start).toBeLessThan(120);

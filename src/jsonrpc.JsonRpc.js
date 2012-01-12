@@ -1,6 +1,6 @@
 jsonrpc = window.jsonrpc || { };
 
-jsonrpc.JsonRpc = function(url) {
+jsonrpc.JsonRpc = function (url) {
 	this._url = url;
 	this.loading = new jsonrpc.Observable();
 	this.loaded = new jsonrpc.Observable();
@@ -9,7 +9,7 @@ jsonrpc.JsonRpc = function(url) {
 };
 
 jsonrpc.JsonRpc.prototype = {
-	call: function(/* ... */) {
+	call: function () {
 		var args = this._getParams.apply(this, arguments);
 
 		this._loadingState.enter();
@@ -31,26 +31,26 @@ jsonrpc.JsonRpc.prototype = {
 			data.push(requests[i].request);
 		}
 
-		if(data.length === 1) {
+		if (data.length === 1) {
 			data = data[0];
 		}
 
-		me._doJsonPost(me._url, data, function(htmlSuccess, htmlResponse) {
+		me._doJsonPost(me._url, data, function (htmlSuccess, htmlResponse) {
 			var responses;
 			if (htmlSuccess) {
 				responses = (me._isArray(htmlResponse) ? htmlResponse : [htmlResponse]);
 			} else {
 				responses = [];
 				for (i = 0; i < requests.length; i += 1) {
-					responses[i] = { id:i, error:{ message:htmlResponse } };
+					responses[i] = { id: i, error: { message: htmlResponse } };
 				}
 			}
 			me._handleResponses(requests, responses);
 		});
 	},
 
-	_handleResponses: function(requests, responses) {
-		var response, request;
+	_handleResponses: function (requests, responses) {
+		var i, response, request;
 		for (i = 0; i < responses.length; i += 1) {
 			response = responses[i];
 			request = requests[response.id];
@@ -72,7 +72,7 @@ jsonrpc.JsonRpc.prototype = {
 		request.callback.call(request.scope, success, ret);
 	},
 
-	_getParams: function(/* ... */) {
+	_getParams: function () {
 		var args = Array.prototype.slice.call(arguments),
 			ret = {
 				request: {
@@ -82,11 +82,11 @@ jsonrpc.JsonRpc.prototype = {
 			};
 
 		ret.request.params = [];
-		while (args.length > 1 && !this._isFunction(args[0])) {
+		while (args.length > 1 && !this._isfunction(args[0])) {
 			ret.request.params.push(args.shift());
 		}
 
-		if (this._isFunction(args[0])) {
+		if (this._isfunction(args[0])) {
 			ret.success = args[0];
 			ret.scope = args[1];
 		} else {
@@ -95,9 +95,9 @@ jsonrpc.JsonRpc.prototype = {
 			ret.callback = args[0].callback;
 			ret.scope = args[0].scope;
 		}
-		ret.success = ret.success || function() { return; };
-		ret.failure = ret.failure || function() { return; };
-		ret.callback = ret.callback || function() { return; };
+		ret.success = ret.success || function () { return; };
+		ret.failure = ret.failure || function () { return; };
+		ret.callback = ret.callback || function () { return; };
 
 		return ret;
 	},
@@ -106,15 +106,15 @@ jsonrpc.JsonRpc.prototype = {
 		return Object.prototype.toString.apply(v) === '[object Array]';
 	},
 
-	_isFunction: function(v) {
+	_isFunction: function (v) {
 		return Object.prototype.toString.apply(v) === '[object Function]';
 	},
 
-	_doJsonPost: function(url, data, callback) {
+	_doJsonPost: function (url, data, callback) {
 		var xhr = new XMLHttpRequest();
 		xhr.open("POST", url, true);
 		xhr.setRequestHeader('Content-Type', 'application/json');
-		xhr.onreadystatechange = function() {
+		xhr.onreadystatechange = function () {
 			if (xhr.readyState !== 4) {
 				return;
 			}
