@@ -21,7 +21,7 @@ task('jslint', function () {
 		.include('/test/**/*.js')
 		.scan();
 	var options = { browser: true, nomen: true, sloppy: true }; //{ white: true, onevar: true, undef: true, regexp: true, plusplus: true, bitwise: true, newcap: true, sloppy: true, nomen: true };
-	var globals = { jsonrpc: true, jasmine: false, describe: false, expect: false, spyOn: false, waitsFor: false, runs: false, beforeEach: false, it: false };
+	var globals = { jsonrpc: true, jasmine: false, describe: false, expect: false, spyOn: false, waits: false, waitsFor: false, runs: false, beforeEach: false, it: false };
 	js.jslint(files, options, globals);
 });
 
