@@ -82,11 +82,11 @@ jsonrpc.JsonRpc.prototype = {
 			};
 
 		ret.request.params = [];
-		while (args.length > 1 && !this._isfunction(args[0])) {
+		while (args.length > 1 && !this._isFunction(args[0])) {
 			ret.request.params.push(args.shift());
 		}
 
-		if (this._isfunction(args[0])) {
+		if (this._isFunction(args[0])) {
 			ret.success = args[0];
 			ret.scope = args[1];
 		} else {
