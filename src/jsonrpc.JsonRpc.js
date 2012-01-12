@@ -16,18 +16,19 @@ jsonrpc.JsonRpc.prototype = {
 		me._loadingState.enter();
 		
 		me._doJsonPost(me._url, args.request, function(htmlSuccess, htmlResponse) {
+			var success, response;
 			me._loadingState.exit();
 			if (!htmlSuccess) {
-				htmlResponse = { error: { message: htmlResponse } };
+				htmlResponse = { error:{ message:htmlResponse } };
 			}
-			htmlSuccess = htmlSuccess && !htmlResponse.error;
-			htmlResponse = (htmlSuccess ? htmlResponse.result : htmlResponse.error.message);
-			if (htmlSuccess) {
-				args.success.call(args.scope, htmlResponse);
+			success = htmlSuccess && !htmlResponse.error;
+			response = (success ? htmlResponse.result : htmlResponse.error.message);
+			if (success) {
+				args.success.call(args.scope, response);
 			} else {
-				args.failure.call(args.scope, htmlResponse);
+				args.failure.call(args.scope, response);
 			}
-			args.callback.call(args.scope, htmlSuccess, htmlResponse);
+			args.callback.call(args.scope, success, response);
 		});
 	},
 
