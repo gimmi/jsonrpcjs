@@ -1,6 +1,11 @@
 JSON-RPC 2.0 client library for Javascript
 ------------------------------------------
 
+Blah blah blah
+
+Sample code
+-----------
+
 	<html>
 	<head>
 		<title></title>
@@ -17,7 +22,7 @@ JSON-RPC 2.0 client library for Javascript
 			// Simple call style
 			rpc.call('aMethod', 'param1', 'param2', 'param3', function (result) {
 				console.log('Method aMethod called with param1, param2, param3. Return value is: ' + result);
-			}, window); // 'window' is the optional scope for callback
+			});
 			
 			// Extended call style
 			rpc.call('anotherMethod', 'param1', 'param2', 'param3', {
