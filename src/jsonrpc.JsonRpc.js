@@ -21,24 +21,44 @@ jsonrpc.JsonRpc.prototype = {
 
 	_doRequest: function () {
 		var me = this,
-			args = this._requests[0];
+			requests = this._requests,
+			data = [],
+			i;
 
 		this._requests = [];
 
-		me._doJsonPost(me._url, args.request, function(htmlSuccess, htmlResponse) {
-			var success, response;
-			me._loadingState.exit();
-			if (!htmlSuccess) {
-				htmlResponse = { error:{ message:htmlResponse } };
-			}
-			success = htmlSuccess && !htmlResponse.error;
-			response = (success ? htmlResponse.result : htmlResponse.error.message);
-			if (success) {
-				args.success.call(args.scope, response);
+		for (i = 0; i < requests.length; i += 1) {
+			requests[i].request.id = i;
+			data.push(requests[i].request);
+		}
+
+		if(data.length === 1) {
+			data = data[0];
+		}
+
+		me._doJsonPost(me._url, data, function(htmlSuccess, htmlResponse) {
+			var responses,
+				success,
+				response;
+			if (htmlSuccess) {
+				responses = (me._isArray(htmlResponse) ? htmlResponse : [htmlResponse]);
 			} else {
-				args.failure.call(args.scope, response);
+				responses = [];
+				for (i = 0; i < requests.length; i += 1) {
+					responses[i] = { id:i, error:{ message:htmlResponse } };
+				}
 			}
-			args.callback.call(args.scope, success, response);
+			for (i = 0; i < responses.length; i += 1) {
+				me._loadingState.exit();
+				success = htmlSuccess && !responses[i].error;
+				response = (success ? responses[i].result : responses[i].error.message);
+				if (success) {
+					requests[responses[i].id].success.call(requests[responses[i].id].scope, response);
+				} else {
+					requests[responses[i].id].failure.call(requests[responses[i].id].scope, response);
+				}
+				requests[responses[i].id].callback.call(requests[responses[i].id].scope, success, response);
+			}
 		});
 	},
 

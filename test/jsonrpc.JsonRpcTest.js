@@ -79,7 +79,7 @@ describe("jsonrpc.JsonRpc", function () {
 
 		expect(target._doJsonPost).toHaveBeenCalledWith('rpc', {
 			jsonrpc: '2.0',
-			id: 1,
+			id: 0,
 			method: 'method',
 			params: [1, 2, 3]
 		}, jasmine.any(Function));
@@ -92,7 +92,7 @@ describe("jsonrpc.JsonRpc", function () {
 		    callbackFn = jasmine.createSpy();
 
 		spyOn(target, '_doJsonPost').andCallFake(function (url, data, callback) {
-			callback(true, { result: 'return val' });
+			callback(true, { id: 0, result: 'return val' });
 		});
 
 		target.call('method', 1, 2, 3, {
@@ -142,7 +142,7 @@ describe("jsonrpc.JsonRpc", function () {
 		    callbackFn = jasmine.createSpy();
 
 		spyOn(target, '_doJsonPost').andCallFake(function (url, data, callback) {
-			callback(true, { error: { message: 'rpc error' } });
+			callback(true, { id: 0, error: { message: 'rpc error' } });
 		});
 
 		target.call('method', 1, 2, 3, {
@@ -166,12 +166,16 @@ describe("jsonrpc.JsonRpc", function () {
 		target.loading.bind(loadingFn);
 		target.loaded.bind(loadedFn);
 		spyOn(target, '_doJsonPost').andCallFake(function (url, data, callback) {
-			callback(true, { result: 'return val' });
+			callback(true, { id: 0, result: 'return val' });
 		});
 
 		target.call('method', 1, 2, 3, function () {});
 
 		expect(loadingFn.callCount).toBe(1);
 		expect(loadedFn.callCount).toBe(1);
+	});
+
+	it('should support responses in different order than requests', function () {
+		// TODO
 	});
 });
