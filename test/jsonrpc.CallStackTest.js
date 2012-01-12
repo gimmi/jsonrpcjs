@@ -30,7 +30,7 @@ describe('jsonrpc.CallStack', function () {
 			enter = [],
 			exit = [],
 			target;
-		target = new jsonrpc.CallStack(function () { enter.push(++count); }, null, function () { exit.push(++count); }, null);
+		target = new jsonrpc.CallStack(function () { count += 1; enter.push(count); }, null, function () { count += 1; exit.push(count); }, null);
 
 		target.exit();
 		target.enter();
