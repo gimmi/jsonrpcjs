@@ -6,6 +6,8 @@ jsonrpc.JsonRpc = function (url) {
 	this.loaded = new jsonrpc.Observable();
 	this._loadingState = new jsonrpc.CallStack(this.loading.trigger, this.loading, this.loaded.trigger, this.loaded);
 	this._requests = [];
+	this._batchingMilliseconds = 10;
+	this._delayedTask = new jsonrpc.DelayedTask();
 };
 
 jsonrpc.JsonRpc.prototype = {
@@ -15,10 +17,14 @@ jsonrpc.JsonRpc.prototype = {
 		this._loadingState.enter();
 		this._requests.push(args);
 
-		this._doRequest();
+		if (this._batchingMilliseconds) {
+			this._delayedTask.delay(this._batchingMilliseconds, this._sendRequests, this);
+		} else {
+			this._sendRequests();
+		}
 	},
 
-	_doRequest: function () {
+	_sendRequests: function () {
 		var me = this,
 			requests = this._requests,
 			data = [],
