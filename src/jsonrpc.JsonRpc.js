@@ -6,15 +6,25 @@ jsonrpc.JsonRpc = function(url) {
 	this.loading = new jsonrpc.Observable();
 	this.loaded = new jsonrpc.Observable();
 	this._loadingState = new jsonrpc.CallStack(this.loading.trigger, this.loading, this.loaded.trigger, this.loaded);
+	this._requests = [];
 };
 
 jsonrpc.JsonRpc.prototype = {
 	call: function(/* ... */) {
-		var me = this,
-			args = me._getParams.apply(this, arguments);
+		var args = this._getParams.apply(this, arguments);
 
-		me._loadingState.enter();
-		
+		this._loadingState.enter();
+		this._requests.push(args);
+
+		this._doRequest();
+	},
+
+	_doRequest: function () {
+		var me = this,
+			args = this._requests[0];
+
+		this._requests = [];
+
 		me._doJsonPost(me._url, args.request, function(htmlSuccess, htmlResponse) {
 			var success, response;
 			me._loadingState.exit();
