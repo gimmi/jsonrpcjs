@@ -14,6 +14,17 @@ describe("jsonrpc.JsonRpc", function () {
 		})).toBe(true);
 	});
 
+	it("isArray", function () {
+		expect(target._isArray()).toBe(false);
+		expect(target._isArray([])).toBe(true);
+		expect(target._isArray({})).toBe(false);
+		expect(target._isArray(123)).toBe(false);
+		expect(target._isArray('')).toBe(false);
+		expect(target._isArray('a string')).toBe(false);
+		expect(target._isArray(null)).toBe(false);
+		expect(target._isArray(arguments)).toBe(false);
+	});
+
 	it('should interpret call with succes function and scope', function () {
 		var scope = {},
 			successFn = jasmine.createSpy(),

@@ -62,6 +62,10 @@ jsonrpc.JsonRpc.prototype = {
 		return ret;
 	},
 
+	_isArray: function (v) {
+		return Object.prototype.toString.apply(v) === '[object Array]';
+	},
+
 	_isFunction: function(v) {
 		return Object.prototype.toString.apply(v) === '[object Function]';
 	},
