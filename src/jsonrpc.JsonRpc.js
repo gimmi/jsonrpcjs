@@ -2,7 +2,6 @@ jsonrpc = window.jsonrpc || { };
 
 jsonrpc.JsonRpc = function(url) {
 	this._url = url;
-	this._id = 0;
 	this.loading = new jsonrpc.Observable();
 	this.loaded = new jsonrpc.Observable();
 	this._loadingState = new jsonrpc.CallStack(this.loading.trigger, this.loading, this.loaded.trigger, this.loaded);
@@ -37,9 +36,7 @@ jsonrpc.JsonRpc.prototype = {
 		}
 
 		me._doJsonPost(me._url, data, function(htmlSuccess, htmlResponse) {
-			var responses,
-				success,
-				response;
+			var responses;
 			if (htmlSuccess) {
 				responses = (me._isArray(htmlResponse) ? htmlResponse : [htmlResponse]);
 			} else {
@@ -48,18 +45,31 @@ jsonrpc.JsonRpc.prototype = {
 					responses[i] = { id:i, error:{ message:htmlResponse } };
 				}
 			}
-			for (i = 0; i < responses.length; i += 1) {
-				me._loadingState.exit();
-				success = htmlSuccess && !responses[i].error;
-				response = (success ? responses[i].result : responses[i].error.message);
-				if (success) {
-					requests[responses[i].id].success.call(requests[responses[i].id].scope, response);
-				} else {
-					requests[responses[i].id].failure.call(requests[responses[i].id].scope, response);
-				}
-				requests[responses[i].id].callback.call(requests[responses[i].id].scope, success, response);
-			}
+			me._handleResponses(requests, responses);
 		});
+	},
+
+	_handleResponses: function(requests, responses) {
+		var response, request;
+		for (i = 0; i < responses.length; i += 1) {
+			response = responses[i];
+			request = requests[response.id];
+			this._handleResponse(request, response);
+		}
+	},
+
+	_handleResponse: function (request, response) {
+		var success = !response.error,
+			ret = (success ? response.result : response.error.message);
+
+		this._loadingState.exit();
+
+		if (success) {
+			request.success.call(request.scope, ret);
+		} else {
+			request.failure.call(request.scope, ret);
+		}
+		request.callback.call(request.scope, success, ret);
 	},
 
 	_getParams: function(/* ... */) {
@@ -67,7 +77,6 @@ jsonrpc.JsonRpc.prototype = {
 			ret = {
 				request: {
 					jsonrpc: '2.0',
-					id: ++this._id,
 					method: args.shift()
 				}
 			};

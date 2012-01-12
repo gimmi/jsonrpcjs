@@ -32,7 +32,6 @@ describe("jsonrpc.JsonRpc", function () {
 
 		actual = target._getParams('method', 1, 2, 3, successFn, scope);
 
-		expect(actual.request.id).toEqual(1);
 		expect(actual.request.method).toEqual('method');
 		expect(actual.request.params).toEqual([1, 2, 3]);
 		expect(actual.success).toBe(successFn);
@@ -40,11 +39,7 @@ describe("jsonrpc.JsonRpc", function () {
 	});
 
 	it('should assign progressive ids', function () {
-		var successFn = jasmine.createSpy();
-
-		expect(target._getParams('method', successFn).request.id).toEqual(1);
-		expect(target._getParams('method', successFn).request.id).toEqual(2);
-		expect(target._getParams('method', successFn).request.id).toEqual(3);
+		// TODO
 	});
 
 	it('should interpret call with options', function () {
@@ -61,7 +56,6 @@ describe("jsonrpc.JsonRpc", function () {
 			scope: scope
 		});
 
-		expect(actual.request.id).toEqual(1);
 		expect(actual.request.method).toEqual('method');
 		expect(actual.request.params).toEqual([1, 2, 3]);
 		expect(actual.success).toBe(successFn);
