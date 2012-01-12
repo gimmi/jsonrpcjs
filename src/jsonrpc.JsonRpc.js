@@ -15,19 +15,19 @@ jsonrpc.JsonRpc.prototype = {
 
 		me._loadingState.enter();
 		
-		me._doJsonPost(me._url, args.request, function(success, data) {
+		me._doJsonPost(me._url, args.request, function(htmlSuccess, htmlData) {
 			me._loadingState.exit();
-			if (!success) {
-				data = { error: { message: data } };
+			if (!htmlSuccess) {
+				htmlData = { error: { message: htmlData } };
 			}
-			success = success && !data.error;
-			data = (success ? data.result : data.error.message);
-			if (success) {
-				args.success.call(args.scope, data);
+			htmlSuccess = htmlSuccess && !htmlData.error;
+			htmlData = (htmlSuccess ? htmlData.result : htmlData.error.message);
+			if (htmlSuccess) {
+				args.success.call(args.scope, htmlData);
 			} else {
-				args.failure.call(args.scope, data);
+				args.failure.call(args.scope, htmlData);
 			}
-			args.callback.call(args.scope, success, data);
+			args.callback.call(args.scope, htmlSuccess, htmlData);
 		});
 	},
 
