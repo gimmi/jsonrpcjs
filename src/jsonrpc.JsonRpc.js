@@ -1,5 +1,3 @@
-jsonrpc = window.jsonrpc || { };
-
 jsonrpc.JsonRpc = function (url) {
 	this._url = url;
 	this.loading = new jsonrpc.Observable();

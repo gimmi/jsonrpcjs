@@ -1,5 +1,3 @@
-jsonrpc = window.jsonrpc || { };
-
 jsonrpc.DelayedTask = function (fn, scope, args) {
 	this._fn = fn || function () {};
 	this._scope = scope || undefined;

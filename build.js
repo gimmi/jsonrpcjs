@@ -1,18 +1,19 @@
 load('tools/jslint/jslint.js');
 load('tools/jsmake.javascript.JavascriptUtils.js');
 
+var uglifyjs = require('tools/uglifyjs/uglify-js');
 var fs = jsmake.Fs;
 var utils = jsmake.Utils;
 var sys = jsmake.Sys;
 var js = new jsmake.javascript.JavascriptUtils();
 
-var version, versionStr;
+var version, buildName;
 
 task('default', 'build');
 
 task('version', function () {
 	version = JSON.parse(fs.readFile('version.json'));
-	versionStr = [ version.major, version.minor, version.patch ].join('.');
+	buildName = 'jsonrpcjs-' + [ version.major, version.minor, version.patch ].join('.');
 });
 
 task('jslint', function () {
@@ -25,37 +26,50 @@ task('jslint', function () {
 	js.jslint(files, options, globals);
 });
 
-task('build', ['version', 'test'], function () {
-	var buildName = 'jsonrpc-' + versionStr;
+task('build', ['version', 'jslint'], function () {
 	fs.deletePath(fs.combinePaths('build', buildName));
 	
 	var header = [];
 	header.push('/*');
-	header.push('JsonRpcJs version ' + versionStr);
+	header.push(buildName);
 	header.push('');
 	header.push('http://github.com/gimmi/jsonrpcjs/');
 	header.push('');
 	header.push(fs.readFile('LICENSE'));
 	header.push('*/');
-	
+	header = header.join('\n');
+
 	var files = fs.createScanner('src')
 		.include('**/*.js')
 		.scan();
 
 	var content = utils.map(files, function (file) {
 		return fs.readFile(file);
-	});
+	}).join('\n');
 
-	fs.writeFile(fs.combinePaths('build', buildName, buildName + '.js'), header.concat(content).join('\n'));
+	var fileName = fs.combinePaths('build', buildName, buildName + '.amd.js');
+	var fileContent = [
+		header,
+		'define(function () {',
+		'var jsonrpc = {};',
+		content,
+		'return jsonrpc.JsonRpc;',
+		'});'
+	].join('\n');
+	fs.writeFile(fileName, fileContent);
 
-	var uglifyjs = require('tools/uglifyjs/uglify-js');
-	content = uglifyjs(content.join('\n'));
-	fs.writeFile(fs.combinePaths('build', buildName, buildName + '.min.js'), header.concat(content).join('\n'));
+	fileName = fs.combinePaths('build', buildName, buildName + '.js');
+	fileContent = header + '\njsonrpc = {};\n' + content;
+	fs.writeFile(fileName, fileContent);
+
+	fileName = fs.combinePaths('build', buildName, buildName + '.min.js');
+	fileContent = header + '\n' + uglifyjs('jsonrpc = {};' + content);
+	fs.writeFile(fileName, fileContent);
 	
 	fs.zipPath(fs.combinePaths('build', buildName), fs.combinePaths('build', buildName + '.zip'));
 });
 
-task('test', 'jslint', function () {
+task('test', 'build', function () {
 	var runner = jsmake.Sys.createRunner('java');
 	runner.args('-cp', 'tools/jsmake/js.jar');
 	runner.args('org.mozilla.javascript.tools.shell.Main'); 
@@ -63,7 +77,7 @@ task('test', 'jslint', function () {
 	runner.args('-modules', '.');
 	runner.args('specrunner.js');
 	var files = fs.createScanner('.')
-		.include('/src/**/*.js')
+		.include(fs.combinePaths('build', buildName, buildName + '.js'))
 		.include('/test/**/*.js')
 		.scan();
 	utils.each(files, function (file) {
@@ -72,7 +86,7 @@ task('test', 'jslint', function () {
 	runner.run();
 });
 
-task('release', [ 'build' ], function () {
+task('release', 'test', function () {
 	version.patch += 1;
 	fs.writeFile('version.json', JSON.stringify(version));
 });

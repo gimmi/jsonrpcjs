@@ -1,5 +1,3 @@
-jsonrpc = window.jsonrpc || { };
-
 jsonrpc.Observable = function () {
 	this._listeners = [];
 };

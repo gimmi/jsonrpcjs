@@ -1,5 +1,3 @@
-jsonrpc = window.jsonrpc || { };
-
 jsonrpc.CallStack = function (enterFn, enterScope, exitFn, exitScope) {
 	this._counter = 0;
 	this._enterFn = enterFn;
