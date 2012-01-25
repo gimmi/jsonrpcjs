@@ -3,7 +3,7 @@ describe("jsonrpc.JsonRpc", function () {
 
 	beforeEach(function () {
 		target = new jsonrpc.JsonRpc('rpc');
-		target._batchingMilliseconds = 0;
+		target.setBatchingMilliseconds(0);
 		spyOn(target, '_doJsonPost').andCallFake(function (url, data, callback) {
 			callback(fakeSuccess, fakeResponse);
 		});
@@ -43,7 +43,7 @@ describe("jsonrpc.JsonRpc", function () {
 	});
 
 	it('should batch calls within timeout', function () {
-		target._batchingMilliseconds = 10;
+		target.setBatchingMilliseconds(10);
 
 		runs(function () {
 			target.call('method1', 'par1', jasmine.createSpy(), {});
@@ -83,7 +83,7 @@ describe("jsonrpc.JsonRpc", function () {
 	it('should wrap batched call in single loading/loaded events', function () {
 		var loadingFn = jasmine.createSpy(),
 			loadedFn = jasmine.createSpy();
-		target._batchingMilliseconds = 10;
+		target.setBatchingMilliseconds(10);
 		target.loading.bind(loadingFn);
 		target.loaded.bind(loadedFn);
 
@@ -105,7 +105,7 @@ describe("jsonrpc.JsonRpc", function () {
 	});
 
 	it('should assign progressive ids', function () {
-		target._batchingMilliseconds = 10;
+		target.setBatchingMilliseconds(10);
 
 		runs(function () {
 			target.call('method1', {});

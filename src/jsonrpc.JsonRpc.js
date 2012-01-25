@@ -9,6 +9,10 @@ jsonrpc.JsonRpc = function (url) {
 };
 
 jsonrpc.JsonRpc.prototype = {
+	setBatchingMilliseconds: function (value) {
+		this._batchingMilliseconds = value;
+	},
+
 	call: function () {
 		var args = this._getParams.apply(this, arguments);
 
