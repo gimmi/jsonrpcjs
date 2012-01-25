@@ -248,6 +248,23 @@ describe("jsonrpc.JsonRpc", function () {
 		expect(callbackFn.callCount).toBe(1);
 	});
 
+	it('should trigger unhandledFailure event when call fail and failure callback not defined', function () {
+		var unhandledFailureFn = jasmine.createSpy();
+
+		target.unhandledFailure.bind(unhandledFailureFn);
+
+		fakeSuccess = false;
+		fakeResponse = 'error msg';
+
+		target.call('method', jasmine.createSpy());
+		target.call('method', {
+			failure: jasmine.createSpy()
+		});
+
+		expect(unhandledFailureFn.callCount).toBe(1);
+		expect(unhandledFailureFn).toHaveBeenCalledWith('error msg');
+	});
+
 	it('should trigger loading and loaded events', function () {
 		var loadingFn = jasmine.createSpy(),
 		    loadedFn = jasmine.createSpy();

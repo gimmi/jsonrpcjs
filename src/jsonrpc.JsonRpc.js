@@ -2,6 +2,7 @@ jsonrpc.JsonRpc = function (url) {
 	this._url = url;
 	this.loading = new jsonrpc.Observable();
 	this.loaded = new jsonrpc.Observable();
+	this.unhandledFailure = new jsonrpc.Observable();
 	this._loadingState = new jsonrpc.CallStack(this.loading.trigger, this.loading, this.loaded.trigger, this.loaded);
 	this._requests = [];
 	this._batchingMilliseconds = 10;
@@ -81,7 +82,8 @@ jsonrpc.JsonRpc.prototype = {
 	},
 
 	_getParams: function () {
-		var args = Array.prototype.slice.call(arguments),
+		var me = this,
+			args = Array.prototype.slice.call(arguments),
 			ret = {
 				request: {
 					jsonrpc: '2.0',
@@ -104,7 +106,7 @@ jsonrpc.JsonRpc.prototype = {
 			ret.scope = args[0].scope;
 		}
 		ret.success = ret.success || function () { return; };
-		ret.failure = ret.failure || function () { return; };
+		ret.failure = ret.failure || function () { me.unhandledFailure.trigger.apply(me.unhandledFailure, arguments); };
 		ret.callback = ret.callback || function () { return; };
 
 		return ret;

@@ -19,6 +19,9 @@ Sample code
 			rpc.loading.bind(function(){ console.log('loading...'); });
 			rpc.loaded.bind(function(){ console.log('done!'); });
 			
+			// Handy interceptors for all RPC calls that fails and for which there's no failure callback defined
+			rpc.unhandledFailure.bind(function(){ console.log('an rpc call failed, and has not  failure callback defined'); });
+			
 			// Simple call style
 			rpc.call('aMethod', 'param1', 'param2', 'param3', function (result) {
 				console.log('Method aMethod called with param1, param2, param3. Return value is: ' + result);
