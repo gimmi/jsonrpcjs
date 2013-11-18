@@ -23,8 +23,8 @@ Sample code
 			rpc.unhandledFailure.bind(function(){ console.log('an rpc call failed, and has not  failure callback defined'); });
 			
 			// Simple call style
-			rpc.call('aMethod', 'param1', 'param2', 'param3', function (result) {
-				console.log('Method aMethod called with param1, param2, param3. Return value is: ' + result);
+			rpc.call('aMethod', 'param1', 'param2', 'param3', function (result, code) {
+				console.log('Method aMethod called with param1, param2, param3. Return value is: ' + result + 'with code:'+ code);
 			});
 			
 			// Extended call style
