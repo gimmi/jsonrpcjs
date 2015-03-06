@@ -3,21 +3,29 @@ JSON-RPC 2.0 client library for Javascript
 
 Fork of jsonrpcjs 2.0 to support named parameters and code/message handling:
 
-Sample code of wrapper javascript definition: callerConstructorWrapper.js
+Sample code of wrapper javascript definition: jsonRpcCallList.js
 -----------------------------------------------------------------------
 
-    function sampleCallFunction(data, sampleCallback) {
-        callerConstructorWrapper("sampleCallFunction", {
-            signData: data
+define(['js/jsonRPC/callerConstructorWrapper'] , function (callerConstructorWrapper) {
+
+    function sampleMethodName(data, sampleCallback) {
+        callerConstructorWrapper("sampleMethodName", {
+            sampleData: data
         },
 
         function (result, error) {
             sampleCallback(result, error);
         });
-}
+    }
+    
+    return {
+            sampleMethodName: sampleMethodName,
+        }
+});
 
 Sample code of wrapper javascript definition: callerConstructorWrapper.js
 -----------------------------------------------------------------------
+define(['js/jsonRPC/jsonrpcjs-0.1.8_fork'], function (jsonRPC, log, capsCONST) {
 
 	function logActionFailure(reason, code, methodName, url) {
             log.error('callerConstructorWrapper method "'+methodName+'" failed. Reason: ' + reason + ', code: ' + code + ', url: ' + url);
@@ -71,3 +79,5 @@ Sample code of wrapper javascript definition: callerConstructorWrapper.js
 
             return callEndPoint;
         }
+ return createEndPointCaller;
+});
