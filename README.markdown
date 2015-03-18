@@ -1,39 +1,83 @@
 JSON-RPC 2.0 client library for Javascript
 ------------------------------------------
 
-Blah blah blah
+Fork of jsonrpcjs 2.0 to support named parameters and code/message handling:
 
-Sample code
------------
+Sample code of wrapper javascript definition: jsonRpcCallList.js
+-----------------------------------------------------------------------
 
-	<html>
-	<head>
-		<title></title>
-		<script type="text/javascript" src="jsonrpc.js"></script>
-	</head>
-	<body>
-		<script type="text/javascript">
-			var rpc = new jsonrpc.JsonRpc('http://www.server.com/rpc');
-			
-			// Handy interceptors for showing loading feedback in the UI
-			rpc.loading.bind(function(){ console.log('loading...'); });
-			rpc.loaded.bind(function(){ console.log('done!'); });
-			
-			// Handy interceptors for all RPC calls that fails and for which there's no failure callback defined
-			rpc.unhandledFailure.bind(function(){ console.log('an rpc call failed, and has not  failure callback defined'); });
-			
-			// Simple call style
-			rpc.call('aMethod', 'param1', 'param2', 'param3', function (result) {
-				console.log('Method aMethod called with param1, param2, param3. Return value is: ' + result);
-			});
-			
-			// Extended call style
-			rpc.call('anotherMethod', 'param1', 'param2', 'param3', {
-				success: function (result) { console.log('Method call succeded, result is: ' + result); },
-				failure: function (reason) { console.log('Method call failed because of ' + reason); },
-				callback: function (success, data) { console.log('Method call finished, success=' + success); },
-				scope: window
-			});
-		</script>
-	</body>
-	</html>
+define(['js/jsonRPC/callerConstructorWrapper'] , function (callerConstructorWrapper) {
+
+    function sampleMethodName(data, sampleCallback) {
+        callerConstructorWrapper("sampleMethodName", {
+            sampleData: data
+        },
+
+        function (result, error) {
+            sampleCallback(result, error);
+        });
+    }
+    
+    return {
+            sampleMethodName: sampleMethodName,
+        }
+});
+
+Sample code of wrapper javascript definition: callerConstructorWrapper.js
+-----------------------------------------------------------------------
+define(['js/jsonRPC/jsonrpcjs-0.1.8_fork'], function (jsonRPC, log, capsCONST) {
+
+	function logActionFailure(reason, code, methodName, url) {
+            log.error('callerConstructorWrapper method "'+methodName+'" failed. Reason: ' + reason + ', code: ' + code + ', url: ' + url);
+        }
+
+        function logSucess(methodName, result) {
+            log.devel('callerConstructorWrapper method "'+methodName+'" success', result);
+        }
+
+        function createEndPointCaller(url) {
+            var jsonRpcEndpoint = new jsonRPC.JsonRpc(url);
+            jsonRpcEndpoint.request.bind(function (url, data, xhr) {
+                var name = "POST request ", i=url.lastIndexOf('/')+1;
+                if (i>0) name += url.substr(i)+".";
+                name+=data.method;
+                log.info(name, xhr.getResponseHeader('serverId'));
+            });
+
+
+            function callEndPoint(methodName) {
+
+                var args = [methodName];
+
+                if (arguments.length==3){
+                    args.push(arguments[1]);
+                } else if (arguments.length!=2) {
+                    throw "EndPointCaller must have 2 or 3 arguments!";
+                }
+                var callEnPointCallback=arguments[arguments.length-1];
+
+                args.push({
+                    success: function (result) {
+                        logSucess(methodName, result);
+                    },
+                    failure: function (reason, code) {
+                        logActionFailure(reason, code, methodName, url);
+                        if (!code) {
+                            code = 1000;
+                            if (!reason) {
+                                reason = "processing error";
+                            }
+                        }
+                        callEnPointCallback(null, {code:code, message:reason})
+                    },
+                    callback: function (success, result) {
+                        if (success) callEnPointCallback(result,null);
+                    }
+                });
+                jsonRpcEndpoint.call.apply(jsonRpcEndpoint, args);
+            }
+
+            return callEndPoint;
+        }
+ return createEndPointCaller;
+});

@@ -76,7 +76,7 @@ jsonrpc.JsonRpc.prototype = {
 		if (success) {
 			request.success.call(request.scope, ret);
 		} else {
-			request.failure.call(request.scope, ret);
+			request.failure.call(request.scope, ret, response.error.code);
 		}
 		request.callback.call(request.scope, success, ret);
 	},
@@ -91,9 +91,13 @@ jsonrpc.JsonRpc.prototype = {
 				}
 			};
 
-		ret.request.params = [];
+		ret.request.params = {};
 		while (args.length > 1 && !this._isFunction(args[0])) {
-			ret.request.params.push(args.shift());
+            var parameter = args.shift();
+            for (var nameObj in parameter) {
+                var name = "" + nameObj;
+                ret.request.params[name] = parameter[name];
+            }
 		}
 
 		if (this._isFunction(args[0])) {
